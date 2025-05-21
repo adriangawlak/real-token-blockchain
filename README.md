@@ -1,7 +1,7 @@
 # real-token-blockchain
 Repozytorium zawiera aplikację do tokenizacji nieruchomości przy użyciu technologii blockchain.
-Projekt działa w oparciu o smart kontrakty napisane w Solidity, wraz ze skryptem w JavaScript,
-uruchamianym przez Chainlink Functions w celu przeniesienia danych a API na blockchain.
+Projekt działa w oparciu o smart kontrakty napisane w Solidity, wraz ze skryptem w JavaScript.
+Skrypt jest uruchamiany przez Chainlink Functions w celu przeniesienia danych a API na blockchain.
 
 ## Jak zbudowana jest aplikacja
 
@@ -34,13 +34,13 @@ Metadane odpowiadają danym przekazywanym przez API dla każdego z 20 estateID, 
   Tokeny testowe uzyskane w faucecie dla sieci Ethereum Sepolia można przesłać do Arbitrum Sepolia używając [Arbitrum Bridge](https://bridge.arbitrum.io/?destinationChain=arbitrum-sepolia&sourceChain=sepolia)
 
 
-### Smart kontrakty w Solidity
+### Smart kontrakty w Solidity (contracts)
 * `VerificationManager.sol` - odpowiedzialny za bezpieczeństwo i weryfikację 
 * `ChainlinkConnector.sol` - odpowiada za łączność z API przy pomocy Chainlink Functions, gdzie uruchamiany jest skrypt w JavaScript
 * `RealTokenERC721` - Kontrakt do obsługi tokenizacji pojedynczych tokenów dla nieruchomości
 * `RealTokenERC1155` - Kontrakt do obsługi tokenizacji w standardzie ERC1155 dla wielu tokenów jednej nieruchomości
 
-### Pliki pomocnicze dla celów demonstracyjnych
+### Pliki pomocnicze dla celów demonstracyjnych 
 
 * `ApiData.js` - plik, który pobiera dane z API, służące do przeglądania i będące punktem wyjścia dalszych operacji. Odpowiada za utworzenie części plików json oraz metadanych użytych w demonstracyjnych nieruchomościach.
 * `ipfsPhotos.js` - mapa z przygotowanymi adresami zdjęć wrzuconych do IPFS (wymagana przez ApiData.js)
@@ -134,16 +134,17 @@ Metadane można sprawdzić bezpośrednio w kontrakcie lub używając zmiennej to
 
 7. Kolejnym wdrażanym kontraktem jest `ChainlinkConnector.sol`
 8. Po jego wdrożeniu aktywować należy łączność z Chainlink Functions. 
-   W tym celu na koncie Chainlink należy dodać klienta (Add consumer) podając adres kontraktu `ChainlinkConnector.sol`
-  
+   W tym celu na koncie Chainlink należy dodać klienta (Add consumer) podając adres kontraktu `ChainlinkConnector.sol`.
+   Transakcję można sprawdzić w interfejsie Chainlink.
+   ![chainlink functions](images/chainlinkTransaction.png)
 
-9. Po aktywacji klienta można już z poziomu kontraktu wykonać funkcję sendRequest(), która odczytuje estateID ostatniej zweryfikowanej nieruchomości (domyślnie 0)   
+10. Po aktywacji klienta można już z poziomu kontraktu wykonać funkcję sendRequest(), która odczytuje estateID ostatniej zweryfikowanej nieruchomości (domyślnie 0)   
    i łączy się z API. Funkcja pobiera z API numer kolejnego estateID i dodaje je do zweryfikowanych nieruchomości, co umożliwia dalsze czynności.
-10. Następnie warto zweryfikować adres admina, który domyślnie nie jest zweryfikowanym użytkownikiem.  
+11. Następnie warto zweryfikować adres admina, który domyślnie nie jest zweryfikowanym użytkownikiem.  
    Umożliwi to korzystanie z pozostałych funkcjonalności, które dostępne są tylko po weryfikacji.
-11. Na koniec warto zostawić wdrożenie dwóch ostatnich kontraktów odpowiedzialnych za tokenizację: 
+12. Na koniec warto zostawić wdrożenie dwóch ostatnich kontraktów odpowiedzialnych za tokenizację: 
    `RealTokenERC721` i `RealTokenERC1155`
-12. Aplikacja jest aktywna po wykonaniu powyższych kroków i można przejść do jej używania. Można przejść do tokenizacji nieruchomości i czynności z tym powiązanych.
+13. Aplikacja jest aktywna po wykonaniu powyższych kroków i można przejść do jej używania. Można przejść do tokenizacji nieruchomości i czynności z tym powiązanych.
 
 ---
 
@@ -151,7 +152,4 @@ Metadane można sprawdzić bezpośrednio w kontrakcie lub używając zmiennej to
 Środowisko Remix IDE umożliwia ponowne wgranie umieszczonych na blockchainie smart kontraktów.
 Aby odtworzyć środowisko należy wczytać pliki do Remix IDE (muszą być w takim samym stanie jak podczas wdrożenia).
 Zamiast "Deploy" należy odtworzyć kontrakt używając "At Address" podając adres poprzednio wdrożonych kontraktów.
-
-
-
-
+![Wczytanie kontraktów z adresu](images/ReloadFromAddress.png)
