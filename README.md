@@ -3,16 +3,36 @@ Repozytorium zawiera aplikację do tokenizacji nieruchomości przy użyciu techn
 Projekt działa w oparciu o smart kontrakty napisane w Solidity, wraz ze skryptem w JavaScript.
 Skrypt jest uruchamiany przez Chainlink Functions w celu przeniesienia danych a API na blockchain.
 
+## Spis treści
+
+- [Jak zbudowana jest aplikacja](#jak-zbudowana-jest-aplikacja)
+  - [Tech stack](#tech-stack)
+  - [Opis](#opis)
+- [Wymagania i zawarte pliki](#wymagania-i-zawarte-pliki)
+  - [Wymagania wstępne i aplikacje zewnętrzne](#wymagania-wstępne-i-aplikacje-zewnętrzne)
+  - [Smart kontrakty w Solidity (contracts)](#smart-kontrakty-w-solidity)
+  - [Pliki pomocnicze dla celów demonstracyjnych](#pliki-pomocnicze-dla-celów-demonstracyjnych)
+- [Działanie programu](#działanie-programu)
+  - [Weryfikacja nieruchomości i użytkowników](#weryfikacja-nieruchomości-i-użytkowników)
+  - [Łączność z API i Chainlink Functions](#łączność-z-api-i-chainlink-functions)
+  - [Dostępne standardy](#dostępne-standardy)
+  - [Tokenizacja nieruchomości](#tokenizacja-nieruchomości)
+  - [Pozostałe funkcjonalności dla istniejących tokenów](#pozostałe-funkcjonalności-dla-istniejących-tokenów)
+- [Metadane i IPFS](#metadane-i-ipfs)
+  - [Dostępność metadanych w IPFS i kompatybilność z giełdami](#dostępność-metadanych-w-ipfs-i-kompatybilność-z-giełdami)
+- [Wdrożenie i działanie aplikacji](#wdrożenie-i-działanie-aplikacji)
+  - [Ponowne uruchomienie aplikacji](#ponowne-uruchomienie-aplikacji)
+
 ## Jak zbudowana jest aplikacja
 
-### Tech stack
+#### Tech stack
 * Solidity, JavaScript, Ethers.js, Chainlink Functions, IPFS (poprzez [Pinata](https://app.pinata.cloud/auth/signin)),
 * Standardy [OpenZeppelin](https://docs.openzeppelin.com) (ERC721, ERC1155, ERC2981 dla Royalties, Ownable, Reentrancy Guard)
 * Zewnętrzne API dla danych o nieruchomościach
 * [Remix IDE](https://remix.ethereum.org/) - środowisko wykonawcze
 * [Arbiscan Sepolia](https://sepolia.arbiscan.io) - eksplorator bloków
   
-### Opis
+#### Opis
 Aplikacja składa się z kilku smart kontraktów napisanych w Solidity, przygotowanych do wdrożenia w sieci Arbitrum Sepolia.  
 Projekt nie zawiera frontendu, dlatego konieczne jest testowanie bezpośrednio na blockchainie lub w lokalnej sieci testowej.  
 Rekomendowane do testów jest Remix IDE, który pozwala na lokalne wdrożenie kontraktów umożliwiając sprawdzenie ich działania.  
@@ -25,7 +45,10 @@ Plik estateIdToIpfsMap zawiera przyporządkowane do konkretnych estateID hasze u
 Metadane odpowiadają danym przekazywanym przez API dla każdego z 20 estateID, które odczytywane są przez Chainlink Functions z API.
 
 ----  
-### Wymagania wstępne i aplikacje zewnętrzne
+
+## Wymagania i zawarte pliki
+
+#### Wymagania wstępne i aplikacje zewnętrzne
 - Własny klucz do API (w tym wypadku [ATTOM](https://api.developer.attomdata.com/))
 - Własny klucz do Pinata w celu umieszczenia metadanych w IPFS
 - Konto w Chainlink Functions z wpłaconymi tokenami LINK na pokrycie każdorazowego połączenia z API
@@ -34,13 +57,13 @@ Metadane odpowiadają danym przekazywanym przez API dla każdego z 20 estateID, 
   Tokeny testowe uzyskane w faucecie dla sieci Ethereum Sepolia można przesłać do Arbitrum Sepolia używając [Arbitrum Bridge](https://bridge.arbitrum.io/?destinationChain=arbitrum-sepolia&sourceChain=sepolia)
 
 
-### Smart kontrakty w Solidity (contracts)
+#### Smart kontrakty w Solidity 
 * `VerificationManager.sol` - odpowiedzialny za bezpieczeństwo i weryfikację 
 * `ChainlinkConnector.sol` - odpowiada za łączność z API przy pomocy Chainlink Functions, gdzie uruchamiany jest skrypt w JavaScript
 * `RealTokenERC721` - Kontrakt do obsługi tokenizacji pojedynczych tokenów dla nieruchomości
 * `RealTokenERC1155` - Kontrakt do obsługi tokenizacji w standardzie ERC1155 dla wielu tokenów jednej nieruchomości
 
-### Pliki pomocnicze dla celów demonstracyjnych 
+#### Pliki pomocnicze dla celów demonstracyjnych 
 
 * `ApiData.js` - plik, który pobiera dane z API, służące do przeglądania i będące punktem wyjścia dalszych operacji. Odpowiada za utworzenie części plików json oraz metadanych użytych w demonstracyjnych nieruchomościach.
 * `ipfsPhotos.js` - mapa z przygotowanymi adresami zdjęć wrzuconych do IPFS (wymagana przez ApiData.js)
@@ -54,7 +77,7 @@ Metadane odpowiadają danym przekazywanym przez API dla każdego z 20 estateID, 
 ---    
 
 
-## Opis działania programu
+## Działanie programu
 
 #### Weryfikacja nieruchomości i użytkowników  
 System weryfikacji użytkowników i nieruchomości realizowany jest przez dedykowany kontrakt `VerificationManager.sol`, który odpowiada za bezpieczeństwo i reguluje dostęp do poszczególnych funkcjonalności,
@@ -87,7 +110,7 @@ W funkcji `tokenizePropperty()` podać należy trzy argumenty:
 
 ![tokenizeProperty()](images/tokenizeProperty.png)
   
-#### Pozostałe funkcjonalności  dla istniejących tokenów
+#### Pozostałe funkcjonalności dla istniejących tokenów
 - Transfer tokenów (tylko między zweryfikowanymi użytkownikami)
 - Sprzedaż tokenów (jak wyżej)
 - Obsługa prowizji (Royalties) dzięki implementacji standardu ERC2981 - obsługiwana przez giełdy tokenów NFT
@@ -103,7 +126,7 @@ Podobnie jak w aplikacji powinien istnieć zapisany na blockchainie łącznik gw
 Ponieważ prezentowana aplikacja nie ma frontendu, adres metadanych podawany jest ręcznie podczas tokenizacji.  
 Wszystkie mechanizmy użyte do ich generowania i obsługi zostały zaprezentowane na przykładowych danych.  
 
-### Dostępność metadanych w IPFS i kompatybilność z giełdami  
+#### Dostępność metadanych w IPFS i kompatybilność z giełdami  
 Dzięki zapisaniu danych poprzez Pinata, są one łatwo dostępne dzięki użyciu ich hasza. Zapisany jest on w tokenURI.  
 Zgodność ze standardem i zapis w URI umożliwia dostęp do metadanych giełdom NFT.  
 
