@@ -9,7 +9,8 @@ uruchamianym przez Chainlink Functions w celu przeniesienia danych a API na bloc
 * Solidity, JavaScript, Ethers.js, Chainlink Functions, IPFS (poprzez [Pinata](https://app.pinata.cloud/auth/signin)),
 * Standardy [OpenZeppelin](https://docs.openzeppelin.com) (ERC721, ERC1155, ERC2981 dla Royalties, Ownable, Reentrancy Guard)
 * Zewnętrzne API dla danych o nieruchomościach
-* [Remix IDE](https://remix.ethereum.org/)
+* [Remix IDE](https://remix.ethereum.org/) - środowisko wykonawcze
+* [Arbiscan Sepolia](https://sepolia.arbiscan.io) - eksplorator bloków
   
 ### Opis
 Aplikacja składa się z kilku smart kontraktów napisanych w Solidity, przygotowanych do wdrożenia w sieci Arbitrum Sepolia.  
@@ -48,7 +49,7 @@ Metadane odpowiadają danym przekazywanym przez API dla każdego z 20 estateID, 
 * `estateIdToIpfsMap.json` - zawiera 20 estateID z przyporządkowanymi im adresami metadanych umieszczonych w IPFS. Dane potrzebne do przetestowania funkcji tokenizacji (tokenizeProperty())
 * `chainlinkTestInput.json` - przetransponowana wersja haszy z estateIdToIpfsMap w formacie bytes, bytes stanowi argument dla funkcji testowej testContract() w ChainlinkConnector.sol
 
-* `chainlinkPlayground.js` - plik zawiera 2 wersje skryptu w JavaScript, który wykonywany jest przez kontrakt ChainlinkConnector.sol - wersję z kontraktu oraz wersje która wypisuje odpowiedź w formacie bytes
+* `chainlinkPlayground.js` - plik zawiera 2 wersje skryptu w JavaScript, który wykonywany jest przez kontrakt ChainlinkConnector.sol - wersję z kontraktu oraz wersje która wypisuje odpowiedź w formacie bytes. Działanie skryptu można przetestować w środowisku testowym [Chainlink Playground](https://functions.chain.link/playground)
 
 ---    
 
@@ -110,7 +111,6 @@ Aplikacja jest przystosowana do współpracy z OpenSea SDK, a więc biblioteki u
 
 Przechowywane w metadanych informacje będą zawsze łatwo dostępne poprzez użycie ich hasza. Tak wygląda zawartość metadanych:  
 ![Metadane w IPFS](images/metadata.png)
-
   
 Metadane zawierają również link do zdjęcia każdej ze stokenizowanych nieruchomości.   
 
@@ -122,11 +122,36 @@ Metadane można sprawdzić bezpośrednio w kontrakcie lub używając zmiennej to
 
 --- 
 
-## Wdrożenie aplikacji
+## Wdrożenie i działanie aplikacji
 
 1. Przed wdrożeniem należy upewnić się że portfel ma odpowiednią ilość tokenów SepoliaETH
 2. Konieczne jest też utworzenie konta w Chainlink Functions oraz zasilenie go testowymi tokenami LINK
-3. Wdrożenie należy rozpocząć od `VerificationManager.sol`
-4. Adres kontraktu wyświetlony w Remix lub skopiowany z Metamask należy podać wszystkim kolejnym kontraktom.
+3. Korzystając z Remix IDE należy zmienić EVM na 0.8.24
+4. Każdy z kontraktów należy najpierw skompilować (Ctrl + S) lub korzystając z menu po lewej - Solidity Compiler i wybrać Compile smartContrat.sol, a na koniec Deploy.
+5. Wdrożenie należy rozpocząć od `VerificationManager.sol`
+6. Adres kontraktu wyświetlony w Remix lub skopiowany z Metamask należy później podać wszystkim kolejnym kontraktom.
    ![Deploy kontraktu](images/contractDeploy.png)
+
+7. Kolejnym wdrażanym kontraktem jest `ChainlinkConnector.sol`
+8. Po jego wdrożeniu aktywować należy łączność z Chainlink Functions. 
+   W tym celu na koncie Chainlink należy dodać klienta (Add consumer) podając adres kontraktu `ChainlinkConnector.sol`
+  
+
+9. Po aktywacji klienta można już z poziomu kontraktu wykonać funkcję sendRequest(), która odczytuje estateID ostatniej zweryfikowanej nieruchomości (domyślnie 0)   
+   i łączy się z API. Funkcja pobiera z API numer kolejnego estateID i dodaje je do zweryfikowanych nieruchomości, co umożliwia dalsze czynności.
+10. Następnie warto zweryfikować adres admina, który domyślnie nie jest zweryfikowanym użytkownikiem.  
+   Umożliwi to korzystanie z pozostałych funkcjonalności, które dostępne są tylko po weryfikacji.
+11. Na koniec warto zostawić wdrożenie dwóch ostatnich kontraktów odpowiedzialnych za tokenizację: 
+   `RealTokenERC721` i `RealTokenERC1155`
+12. Aplikacja jest aktywna po wykonaniu powyższych kroków i można przejść do jej używania. Można przejść do tokenizacji nieruchomości i czynności z tym powiązanych.
+
+---
+
+### Ponowne uruchomienie aplikacji 
+Środowisko Remix IDE umożliwia ponowne wgranie umieszczonych na blockchainie smart kontraktów.
+Aby odtworzyć środowisko należy wczytać pliki do Remix IDE (muszą być w takim samym stanie jak podczas wdrożenia).
+Zamiast "Deploy" należy odtworzyć kontrakt używając "At Address" podając adres poprzednio wdrożonych kontraktów.
+
+
+
 
